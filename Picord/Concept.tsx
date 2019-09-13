@@ -1,9 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Image, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableHighlight, Modal } from 'react-native';
+
 import Constants from 'expo-constants'
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
+import * as FileSystem from 'expo-file-system';
 import { Audio } from 'expo-av';
+import { TextSubmitDialog } from './TextSubmitDialog';
 
 
 export interface Props {
@@ -12,14 +15,15 @@ export interface Props {
 
 interface State {
     image: string;
+    titleModalVisible: boolean;
 }
-
 
 export class Concept extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            image: null
+            image: null,
+            titleModalVisible: false
         };
     }
 
@@ -36,18 +40,53 @@ export class Concept extends React.Component<Props, State> {
           }
     }
 
-    _pickImage = async () => {
+    _addPicording = () => {
+        // Make user Set a title for recording
+        this.setTitleModalVisible(true);
+        console.log(this.state.titleModalVisible)
+
+        // Add a picture from the camera roll
+        //this.selectPictureFromCameraRoll()
+
+        // Store picture in app filesystem
+       // this.addPictureToFileSystem()
+        
+        // DB support for file metadata?
+    }
+        
+    
+
+    setTitleModalVisible(visible: boolean): void {
+        this.setState({ titleModalVisible: visible });
+    }
+
+    selectPictureFromCameraRoll = async () => {
         let result: any = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 3],
         });
-
         console.log(result);
 
         if (!result.cancelled) {
-            this.setState({ image: result.uri });
+            this.setState({ image: result.uri }) 
         }
+    }
+
+    addPictureToFileSystem = async () => {
+        // This dir should probably be created on first app init
+        FileSystem.getInfoAsync(FileSystem.documentDirectory + 'Pictures')
+        .then(result => {
+            // The photos should get copied over to a permanent app dir so that
+            // we don't have to worry about losing them. They can still be deleted
+            // from within the app(just like recordings)
+            if(result.exists) {
+
+            }
+        })
+        .catch(() => {
+            console.error('failed trying to find pictures folder')
+        })
     }
 
     _addRecording = async () => {
@@ -57,21 +96,35 @@ export class Concept extends React.Component<Props, State> {
             await recording.startAsync();
         } catch(error) {
             // an error occurred
+            console.log('error getting permissions for recording');
         }
     }
+
+    showImage() : JSX.Element {
+        if (this.state.image) {
+            return <Image style={styles.image} source={{uri: this.state.image}} />
+        } else {
+            return <View/>
+        }
+    }
+
+            
 
     render() {
         return (
             <View style={styles.container}>
+                <TextSubmitDialog
+                  isModalVisible={this.state.titleModalVisible}
+                  onSubmit={() => {this.setTitleModalVisible(!this.state.titleModalVisible);}}
+                  onCancel={() => {this.setTitleModalVisible(!this.state.titleModalVisible);}}
+                />
                 <TouchableHighlight style={styles.imageContainer} onLongPress={this._addRecording}>
-                    { this.state.image && <Image style={styles.image} source={{uri: this.state.image}} />}
+                    { this.showImage() }
                 </TouchableHighlight>
-
-                <Button title="Add Picture" onPress={this._pickImage}/>
+                <Button title="Add Picording" onPress={this._addPicording}/>
             </View>
         );
     }
-
 }
 
 
