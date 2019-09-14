@@ -108,6 +108,15 @@ export class Concept extends React.Component<Props, State> {
         }
     }
 
+    _onSubmit = (text: string): void => {
+        console.log(this.state);
+        this.setTitleModalVisible(!this.state.titleModalVisible);
+        console.log(text);
+    }
+    _onCancel = (): void => {
+        this.setTitleModalVisible(!this.state.titleModalVisible);
+        console.log('Picard was cancelled from title dialog');
+    }
             
 
     render() {
@@ -115,8 +124,9 @@ export class Concept extends React.Component<Props, State> {
             <View style={styles.container}>
                 <TextSubmitDialog
                   isModalVisible={this.state.titleModalVisible}
-                  onSubmit={() => {this.setTitleModalVisible(!this.state.titleModalVisible);}}
-                  onCancel={() => {this.setTitleModalVisible(!this.state.titleModalVisible);}}
+                  onSubmit={this._onSubmit}
+                  onCancel={this._onCancel}
+                  titleText='Enter Picording Title'
                 />
                 <TouchableHighlight style={styles.imageContainer} onLongPress={this._addRecording}>
                     { this.showImage() }
