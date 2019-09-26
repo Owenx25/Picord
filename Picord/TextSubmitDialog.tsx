@@ -54,13 +54,13 @@ export class TextSubmitDialog extends React.Component<Props, State> {
                         </View>
                         <View style={styles.buttonBox}> 
                             <TouchableOpacity onPress={this._onSubmit}>
-                                <View style={[styles.button, {paddingStart: 5}]}>
-                                    <Text style={{fontSize: 20, color: '#7d3c98'}}>{this.props.submitText}</Text>
+                                <View style={[styles.button, {paddingStart: 10}]}>
+                                    <Text style={{fontSize: 16, color: '#512da8'}}>{this.props.submitText}</Text>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={this.props.onCancel}>
-                                <View style={[styles.button, {paddingEnd: 5}]}>
-                                    <Text style={{fontSize: 20, color: '#7d3c98'}}>{this.props.cancelText}</Text>
+                                <View style={[styles.button, {paddingEnd: 10}]}>
+                                    <Text style={{fontSize: 16, color: '#512da8'}}>{this.props.cancelText}</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -78,33 +78,37 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         backgroundColor: '#d1c4e9',
         width: 300,
-        height: 150
+        height: 150,
+        borderRadius: 10
     },
     titleBox: {
         justifyContent: 'flex-start'
     },
     titleText: {
-        paddingTop: 5,
-        paddingStart: 5,
+        padding: 10,
         fontSize: 22,
         color: '#512da8'
     },
     inputTextBox: {
-
+        paddingHorizontal: 20,
+        paddingBottom: 5
     },
     inputText: {
-        paddingHorizontal: 20,
-        backgroundColor: 'white'
+        padding: 8,
+        backgroundColor: 'white',
+        opacity: .7,
+        fontSize: 16
     },
     buttonBox: {
         justifyContent: 'space-between',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        
     },
     button: {
-        paddingBottom: 5,
+        paddingBottom: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#d1c4e9'
+       
     },
     messageText: {
         marginTop: 5,
