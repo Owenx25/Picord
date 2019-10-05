@@ -9,13 +9,14 @@ import { Audio } from 'expo-av';
 import { TextSubmitDialog } from './TextSubmitDialog';
 
 
-export interface Props {
+type Props = typeof Concept.defaultProps & {
 
 }
 
-interface State {
+type State = {
     image: string;
     titleModalVisible: boolean;
+    newPicordingTitle: string;
 }
 
 export class Concept extends React.Component<Props, State> {
@@ -23,8 +24,12 @@ export class Concept extends React.Component<Props, State> {
         super(props);
         this.state = {
             image: null,
-            titleModalVisible: false
+            titleModalVisible: false,
+            newPicordingTitle: null
         };
+    }
+
+    public static defaultProps = {
     }
 
     public componentDidMount() {
@@ -43,20 +48,18 @@ export class Concept extends React.Component<Props, State> {
     _addPicording = () => {
         // Make user Set a title for recording
         this.setTitleModalVisible(true);
-        console.log(this.state.titleModalVisible)
 
-        // Add a picture from the camera roll
-        //this.selectPictureFromCameraRoll()
-
-        // Store picture in app filesystem
-       // this.addPictureToFileSystem()
-        
-        // DB support for file metadata?
+        // Add flow:
+        // Enter a title => Choose a picture => Add a recording => Saved to DB
+        // or...
+        // Add a recording => Choose a picture => Enter a title => Saved to DB
+        //   Recording shoud probably be the FIRST thing the user enters. Title is
+        //   a summary on top.
     }
         
     
 
-    setTitleModalVisible(visible: boolean): void {
+    setTitleModalVisible(visible: boolean) {
         this.setState({ titleModalVisible: visible });
     }
 
@@ -108,14 +111,16 @@ export class Concept extends React.Component<Props, State> {
         }
     }
 
-    _onSubmit = (text: string): void => {
-        console.log(this.state);
+    _onSubmitPicordingTitle = (text: string): void => {    
         this.setTitleModalVisible(!this.state.titleModalVisible);
-        console.log(text);
+        if (text) {
+            this.setState({ newPicordingTitle: text});
+        }
+        this.selectPictureFromCameraRoll();
     }
-    _onCancel = (): void => {
+    _onCancelPicordingTitle = (): void => {
         this.setTitleModalVisible(!this.state.titleModalVisible);
-        console.log('Picard was cancelled from title dialog');
+        console.log('Picording was cancelled from title dialog');
     }
             
 
@@ -124,8 +129,8 @@ export class Concept extends React.Component<Props, State> {
             <View style={styles.container}>
                 <TextSubmitDialog
                   isModalVisible={this.state.titleModalVisible}
-                  onSubmit={this._onSubmit}
-                  onCancel={this._onCancel}
+                  onSubmit={this._onSubmitPicordingTitle}
+                  onCancel={this._onCancelPicordingTitle}
                   titleText='Enter Picording Title'
                 />
                 <TouchableHighlight style={styles.imageContainer} onLongPress={this._addRecording}>

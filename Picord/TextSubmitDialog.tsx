@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity, Modal, GestureResponderEvent, TextInput } from 'react-native';
 
-export interface Props {
+type Props = typeof TextSubmitDialog.defaultProps & {
     isModalVisible : boolean;
     onSubmit: (text: string) => void;
     onCancel: (event: GestureResponderEvent) => void;
@@ -10,16 +10,14 @@ export interface Props {
     cancelText: string;
 }
 
-interface State {
-    inputText: string;
-}
+const initialState = {
+    inputText: ''
+};
+type State = Readonly <typeof initialState>
 
 export class TextSubmitDialog extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
-        this.state = {
-            inputText: ''
-        };
     }
 
     public static defaultProps = {
@@ -30,8 +28,8 @@ export class TextSubmitDialog extends React.Component<Props, State> {
     public componentDidMount() {
     }
 
-    _onChangeText = (text: string): void => { this.setState({inputText: text}) }
-    _onSubmit = (event: GestureResponderEvent): void => { this.props.onSubmit(this.state.inputText); }
+    _onChangeText = (text: string) => { this.setState({inputText: text}) }
+    _onSubmit = (event: GestureResponderEvent) => { this.props.onSubmit(this.state.inputText); }
 
     render(): JSX.Element {
         return (
