@@ -6,7 +6,9 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
 import { Audio } from 'expo-av';
-import { TextSubmitDialog } from './TextSubmitDialog';
+import { GenericSubmitDialog } from './Dialog/GenericSubmitDialog';
+import { AudioRecordingDialogElement } from './Dialog/AudioRecordingDialogElement';
+import { TextInputDialogElement } from './Dialog/TextInputDialogElement';
 
 
 type Props = typeof Concept.defaultProps & {
@@ -16,6 +18,7 @@ type Props = typeof Concept.defaultProps & {
 type State = {
     image: string;
     titleModalVisible: boolean;
+    audioRecordingModalVisible: boolean;
     newPicordingTitle: string;
 }
 
@@ -25,6 +28,7 @@ export class Concept extends React.Component<Props, State> {
         this.state = {
             image: null,
             titleModalVisible: false,
+            audioRecordingModalVisible: false,
             newPicordingTitle: null
         };
     }
@@ -44,24 +48,9 @@ export class Concept extends React.Component<Props, State> {
             }
           }
     }
-
-    _addPicording = () => {
-        // Make user Set a title for recording
-        this.setTitleModalVisible(true);
-
-        // Add flow:
-        // Enter a title => Choose a picture => Add a recording => Saved to DB
-        // or...
-        // Add a recording => Choose a picture => Enter a title => Saved to DB
-        //   Recording shoud probably be the FIRST thing the user enters. Title is
-        //   a summary on top.
-    }
         
-    
-
-    setTitleModalVisible(visible: boolean) {
-        this.setState({ titleModalVisible: visible });
-    }
+    setTitleModalVisible = (visible: boolean) : void => this.setState({ titleModalVisible: visible });
+    setAudioRecordingModalVisible = (visible: boolean) : void => this.setState({ audioRecordingModalVisible: visible });
 
     selectPictureFromCameraRoll = async () => {
         let result: any = await ImagePicker.launchImageLibraryAsync({
@@ -92,6 +81,18 @@ export class Concept extends React.Component<Props, State> {
         })
     }
 
+    _addPicording = () => {
+        // Make user Set a title for recording
+        this.setAudioRecordingModalVisible(true);
+
+        // Add flow:
+        // Enter a title => Choose a picture => Add a recording => Saved to DB
+        // or...
+        // Add a recording => Choose a picture => Enter a title => Saved to DB
+        //   Recording shoud probably be the FIRST thing the user enters. Title is
+        //   a summary on top.
+    }
+
     _addRecording = async () => {
         const recording = new Audio.Recording();
         try {
@@ -111,6 +112,8 @@ export class Concept extends React.Component<Props, State> {
         }
     }
 
+    // Dialog Callbacks
+
     _onSubmitPicordingTitle = (text: string): void => {    
         this.setTitleModalVisible(!this.state.titleModalVisible);
         if (text) {
@@ -122,17 +125,44 @@ export class Concept extends React.Component<Props, State> {
         this.setTitleModalVisible(!this.state.titleModalVisible);
         console.log('Picording was cancelled from title dialog');
     }
+
+    _onSubmitAudioRecording = (recording): void => {    
+        this.setAudioRecordingModalVisible(!this.state.audioRecordingModalVisible);
+        if (recording) {
             
+        }
+    }
+    _onCancelAudioRecording = (): void => {
+        this.setAudioRecordingModalVisible(!this.state.audioRecordingModalVisible);
+        console.log('Picording was cancelled from audio dialog');
+    }
 
     render() {
         return (
             <View style={styles.container}>
-                <TextSubmitDialog
+                <GenericSubmitDialog
                   isModalVisible={this.state.titleModalVisible}
                   onSubmit={this._onSubmitPicordingTitle}
                   onCancel={this._onCancelPicordingTitle}
                   titleText='Enter Picording Title'
-                />
+                >
+                    <TextInputDialogElement
+                        initialText={'test'}
+                        _onChangeText={(text) => {console.log(text)}}
+                    />
+                </GenericSubmitDialog>
+
+
+                <GenericSubmitDialog
+                  isModalVisible={this.state.audioRecordingModalVisible}
+                  onSubmit={this._onSubmitAudioRecording}
+                  onCancel={this._onCancelAudioRecording}
+                  titleText='Record what happened!'
+                >
+                    <AudioRecordingDialogElement
+
+                    />
+                </GenericSubmitDialog>
                 <TouchableHighlight style={styles.imageContainer} onLongPress={this._addRecording}>
                     { this.showImage() }
                 </TouchableHighlight>
@@ -141,8 +171,6 @@ export class Concept extends React.Component<Props, State> {
         );
     }
 }
-
-
 
 const styles = StyleSheet.create({
     container: {

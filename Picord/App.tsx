@@ -1,5 +1,5 @@
 import React from 'react';
-import { Concept } from './Concept';
+import { Concept } from './Components/Concept';
 
 export default function App() {
   return (

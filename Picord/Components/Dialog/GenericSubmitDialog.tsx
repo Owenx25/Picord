@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity, Modal, GestureResponderEvent, TextInput } from 'react-native';
 
-type Props = typeof TextSubmitDialog.defaultProps & {
+type Props = typeof GenericSubmitDialog.defaultProps & {
     isModalVisible : boolean;
     onSubmit: (text: string) => void;
     onCancel: (event: GestureResponderEvent) => void;
@@ -15,7 +15,7 @@ const initialState = {
 };
 type State = Readonly <typeof initialState>
 
-export class TextSubmitDialog extends React.Component<Props, State> {
+export class GenericSubmitDialog extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
     }
@@ -43,13 +43,7 @@ export class TextSubmitDialog extends React.Component<Props, State> {
                         <View style={styles.titleBox}>
                             <Text style={styles.titleText}>{this.props.titleText}</Text>
                         </View>
-                        <View style={styles.inputTextBox}>
-                            <TextInput 
-                              style={styles.inputText}
-                              onChangeText={this._onChangeText}
-                              autoCorrect={true}
-                              clearButtonMode='while-editing'/>
-                        </View>
+                        {this.props.children}
                         <View style={styles.buttonBox}> 
                             <TouchableOpacity onPress={this._onSubmit}>
                                 <View style={[styles.button, {paddingStart: 10}]}>
