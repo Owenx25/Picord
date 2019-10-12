@@ -1,12 +1,26 @@
 import React from 'react';
 import { Concept } from './Components/Concept';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
 
-export default function App() {
-  return (
-    <Concept />
-  );
+class HomeScreen extends React.Component<{}, {}> {
+  render() {
+    return (
+      <Concept />
+  )}
 }
 
+const AppNavigator = createStackNavigator({
+  Home: HomeScreen,
+});
+
+const AppContainer = createAppContainer(AppNavigator)
+
+export default class App extends React.Component {
+    render() {
+        return <AppContainer />
+    }
+}
 // Color Scheme ideas:
 // Purple palette
 // #311b92

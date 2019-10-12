@@ -26,34 +26,24 @@ export class AudioRecordingDialogElement extends React.Component<Props, State> {
 
     render(): JSX.Element {
         return (
-            <View>
-
+            <View style={styles.audioControlsBox}>
+                <TouchableOpacity>
+                    <View style={styles.recordingIcon} />
+                </TouchableOpacity>
+                    <View style={[styles.playIcon, {marginLeft: 15}]}/>
+                <TouchableOpacity/>
+                
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    dialogBox: { 
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'stretch',
-        backgroundColor: '#d1c4e9',
-        width: 300,
-        height: 150,
-        borderRadius: 10
-    },
-    titleBox: {
-        justifyContent: 'flex-start'
-    },
-    titleText: {
-        padding: 10,
-        fontSize: 22,
-        color: '#512da8'
-    },
-    inputTextBox: {
-        paddingHorizontal: 20,
-        paddingBottom: 5
+    audioControlsBox: {
+        paddingHorizontal: 10,
+        paddingVertical: 20,
+        flexDirection: "row"
+        
     },
     inputText: {
         padding: 8,
@@ -61,20 +51,25 @@ const styles = StyleSheet.create({
         opacity: .7,
         fontSize: 16
     },
-    buttonBox: {
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        
+    recordingIcon: {
+        width: 30,
+        height: 30,
+        borderRadius: 30,
+        backgroundColor: 'red'
     },
-    button: {
-        paddingBottom: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-       
-    },
-    messageText: {
-        marginTop: 5,
-        fontSize: 20,
-        color: '#9575cd'
+    playIcon: {
+        width: 0,
+        height: 0,
+        backgroundColor: 'transparent',
+        borderStyle: 'solid',
+        borderLeftWidth: 15,
+        borderRightWidth: 15,
+        borderBottomWidth: 30,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderBottomColor: 'purple',
+        transform: [
+            {rotate: '90deg'}
+        ]
     }
 })

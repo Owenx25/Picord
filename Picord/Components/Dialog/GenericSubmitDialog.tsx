@@ -69,8 +69,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'stretch',
         backgroundColor: '#d1c4e9',
-        width: 300,
-        height: 150,
+        width: 150,
         borderRadius: 10
     },
     titleBox: {
