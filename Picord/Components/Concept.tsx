@@ -1,20 +1,17 @@
 import React from 'react';
 import { StyleSheet, View, Button, Image, TouchableHighlight } from 'react-native';
 
+import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
+
 import Constants from 'expo-constants'
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
-import { Camera } from 'expo-camera';
-
 import { Audio } from 'expo-av';
-import { GenericSubmitDialog } from './Dialog/GenericSubmitDialog';
-import { AudioRecordingDialogElement } from './Dialog/AudioRecordingDialogElement';
-import { TextInputDialogElement } from './Dialog/TextInputDialogElement';
 
 
 type Props = typeof Concept.defaultProps & {
-
+    navigation: NavigationScreenProp<NavigationState, NavigationParams>
 }
 
 type State = {
@@ -76,6 +73,8 @@ export class Concept extends React.Component<Props, State> {
     }
 
     _addPicording = () => {
+        console.log('Navigating to CameraScreen');
+        this.props.navigation.navigate('Camera');
         // Make user Set a title for recording
 
         // Add flow:
@@ -108,7 +107,7 @@ export class Concept extends React.Component<Props, State> {
     render() {
         return (
             <View style={styles.container}>
-                <TouchableHighlight style={styles.imageContainer} onLongPress={this._addRecording}>
+                <TouchableHighlight style={styles.imageContainer} onLongPress={this._addPicording}>
                     { this.showImage() }
                 </TouchableHighlight>
                 <Button title="Add Picording" onPress={this._addPicording}/>

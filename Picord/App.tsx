@@ -3,15 +3,22 @@ import { Concept } from './Components/Concept';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-class HomeScreen extends React.Component<{}, {}> {
+import { CameraScreen } from './Components/CameraScreen'
+
+type Props = typeof HomeScreen.defaultProps & {
+  navigation: NavigationType
+}
+
+class HomeScreen extends React.Component<Props, {}> {
   render() {
     return (
-      <Concept />
+      <Concept navigation={this.props.navigation}/>
   )}
 }
 
 const AppNavigator = createStackNavigator({
   Home: HomeScreen,
+  Camera: CameraScreen
 });
 
 const AppContainer = createAppContainer(AppNavigator)
