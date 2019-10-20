@@ -107,47 +107,83 @@ export class CameraScreen extends React.Component<Props, State> {
                     style={{
                         flex: 1,
                         backgroundColor: 'transparent',
-                        flexDirection: 'row'
+                        flexDirection: 'row',                   
                 }}>
-                    <TouchableOpacity
-                        style={styles.CameraButton}
-                        onPress={this._onChangeCameraType}
+                    <View
+                        style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignSelf: 'flex-end',
+                            alignItems: 'flex-end',
+                            justifyContent: 'space-between',
+                            borderWidth: 1,
+                            borderColor: 'white'
+                        }}
                     >
-                        <Text style={styles.CameraButtonText}>Flip</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.CameraButton, {borderColor: this.flashStyle()}]}
-                        onPress={this._onChangeCameraFlash}
-                    >
-                        <Text style={[styles.CameraButtonText, {color: this.flashStyle()}]}>Flash</Text>
-                    </TouchableOpacity>
-                    { this.isOnAndroid  &&
-                        <TouchableOpacity
-                            style={styles.CameraButton}
-                            onPress={this._onPressRatioToggle}
+                        <View
+                            style={{
+                                borderWidth: 1,
+                                borderColor: 'white'
+                            }}    
                         >
-                            <Text style={styles.CameraButtonText}>{this.state.ratio}</Text>
-                        </TouchableOpacity>
-                    }
+                            <TouchableOpacity
+                                style={styles.CameraButton}
+                                onPress={this._onChangeCameraType}
+                            >
+                                <Text style={styles.CameraButtonText}>Flip</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View
+                            style={{
+                                borderWidth: 1,
+                                borderColor: 'white'
+                            }} 
+                        >
+
+                        </View>
+                        <View
+                            style={{
+                                alignItems: 'flex-end',
+                                borderWidth: 1,
+                                borderColor: 'white'
+                            }}
+                        >
+                            <TouchableOpacity
+                                style={[styles.CameraButton, {borderColor: this.flashStyle()}]}
+                                onPress={this._onChangeCameraFlash}
+                            >
+                                <Text style={[styles.CameraButtonText, {color: this.flashStyle()}]}>Flash</Text>
+                            </TouchableOpacity>
+                            { this.isOnAndroid  &&
+                                <TouchableOpacity
+                                    style={styles.CameraButton}
+                                    onPress={this._onPressRatioToggle}
+                                >
+                                    <Text style={styles.CameraButtonText}>{this.state.ratio}</Text>
+                                </TouchableOpacity>
+                            }
+                        </View>   
+                    </View>
                 </View>
             </Camera>
         </View>
     )}
   }
   const styles = StyleSheet.create({
+
     CameraButton: {
-        flex: 0.2,
-        marginBottom: 20,
-        marginLeft: 20, 
-        alignSelf: 'flex-end',
+        width: 75,
+        margin: 10, 
+        justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'white',
         borderRadius: 10
     },
     CameraButtonText: {
-        fontSize: 24,
+        fontSize: 20,
         padding: 5,
+        paddingHorizontal: 10,
         color: 'white'
     }
   });
