@@ -8,6 +8,11 @@ enum CameraType {
     back = Camera.Constants.Type.back
 }
 
+enum FlashType {
+    on = 'on',
+    off = 'off'
+}
+
 type Props = typeof CameraScreen.defaultProps & {
 
 }
@@ -16,7 +21,8 @@ type State = {
     type: CameraType
     ratio: string,
     ratioIndex: number,
-    ratios: Array<string>
+    ratios: Array<string>,
+    flash: FlashType
 }
 
 export class CameraScreen extends React.Component<Props, State> {
@@ -29,7 +35,8 @@ export class CameraScreen extends React.Component<Props, State> {
             type: CameraType.back,
             ratio: '16:9',
             ratioIndex: 0,
-            ratios: undefined
+            ratios: undefined,
+            flash: FlashType.off
         };
     }
 
@@ -50,7 +57,9 @@ export class CameraScreen extends React.Component<Props, State> {
     }
 
     _onChangeCameraFlash = () => {
-        
+        this.state.flash === FlashType.on
+        ? this.setState({flash: FlashType.off})
+        : this.setState({flash: FlashType.on});
     }
 
     _onPressRatioToggle = () => {
@@ -63,7 +72,7 @@ export class CameraScreen extends React.Component<Props, State> {
         });
     }
 
-    getRatios = async (): Promise<Array<string>> => {
+    async getRatios(): Promise<Array<string>> {
         if (this.state.ratios === undefined) {
             const ratios = await this.camera.current.getSupportedRatiosAsync();
             this.setState({
@@ -73,8 +82,15 @@ export class CameraScreen extends React.Component<Props, State> {
         return Promise.resolve(this.state.ratios);
     };
 
-    canChangeRatios = (): boolean => {
+    isOnAndroid(): boolean {
         return Platform.OS === 'android';
+    }
+
+    flashStyle() {
+        if (this.state.flash === FlashType.off) {
+            return 'red';
+        }
+        return 'white';
     }
     
     render() {
@@ -85,6 +101,7 @@ export class CameraScreen extends React.Component<Props, State> {
                 style={{ flex: 1}} 
                 type={this.state.type} 
                 ratio={this.state.ratio}
+                flashMode={this.state.flash}
             >
                 <View
                     style={{
@@ -99,12 +116,12 @@ export class CameraScreen extends React.Component<Props, State> {
                         <Text style={styles.CameraButtonText}>Flip</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={styles.CameraButton}
+                        style={[styles.CameraButton, {borderColor: this.flashStyle()}]}
                         onPress={this._onChangeCameraFlash}
                     >
-                        <Text style={styles.CameraButtonText}>Flip</Text>
+                        <Text style={[styles.CameraButtonText, {color: this.flashStyle()}]}>Flash</Text>
                     </TouchableOpacity>
-                    { this.canChangeRatios  &&
+                    { this.isOnAndroid  &&
                         <TouchableOpacity
                             style={styles.CameraButton}
                             onPress={this._onPressRatioToggle}
