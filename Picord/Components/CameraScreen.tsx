@@ -15,7 +15,8 @@ type Props = typeof CameraScreen.defaultProps & {
 type State = {
     type: CameraType
     ratio: string,
-    ratioIndex: number
+    ratioIndex: number,
+    ratios: Array<string>
 }
 
 export class CameraScreen extends React.Component<Props, State> {
@@ -27,7 +28,8 @@ export class CameraScreen extends React.Component<Props, State> {
         this.state = {
             type: CameraType.back,
             ratio: '16:9',
-            ratioIndex: 0
+            ratioIndex: 0,
+            ratios: undefined
         };
     }
 
@@ -47,12 +49,14 @@ export class CameraScreen extends React.Component<Props, State> {
         });
     }
 
+    _onChangeCameraFlash = () => {
+        
+    }
+
     _onPressRatioToggle = () => {
         this.getRatios()
         .then((ratios) => {
-            this.setState({
-                ratio: ratios[this.state.ratioIndex]
-            })
+            this.setState({ratio: this.state.ratios[this.state.ratioIndex]})
             this.state.ratioIndex === ratios.length - 1
                 ? this.setState({ ratioIndex: 0 })
                 : this.setState({ ratioIndex: this.state.ratioIndex + 1 })
@@ -60,8 +64,13 @@ export class CameraScreen extends React.Component<Props, State> {
     }
 
     getRatios = async (): Promise<Array<string>> => {
-        const ratios = await this.camera.current.getSupportedRatiosAsync();
-        return ratios;
+        if (this.state.ratios === undefined) {
+            const ratios = await this.camera.current.getSupportedRatiosAsync();
+            this.setState({
+                ratios: ratios
+            })
+        }
+        return Promise.resolve(this.state.ratios);
     };
 
     canChangeRatios = (): boolean => {
@@ -86,6 +95,12 @@ export class CameraScreen extends React.Component<Props, State> {
                     <TouchableOpacity
                         style={styles.CameraButton}
                         onPress={this._onChangeCameraType}
+                    >
+                        <Text style={styles.CameraButtonText}>Flip</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.CameraButton}
+                        onPress={this._onChangeCameraFlash}
                     >
                         <Text style={styles.CameraButtonText}>Flip</Text>
                     </TouchableOpacity>
