@@ -72,6 +72,12 @@ export class CameraScreen extends React.Component<Props, State> {
         });
     }
 
+    _onTakePicture = async () => {
+        if (this.camera) {
+            const photo = await this.camera.current.takePictureAsync();
+        }
+    }
+
     async getRatios(): Promise<Array<string>> {
         if (this.state.ratios === undefined) {
             const ratios = await this.camera.current.getSupportedRatiosAsync();
@@ -86,7 +92,7 @@ export class CameraScreen extends React.Component<Props, State> {
         return Platform.OS === 'android';
     }
 
-    flashStyle() {
+    flashStyle(): string {
         if (this.state.flash === FlashType.off) {
             return 'red';
         }
@@ -136,10 +142,16 @@ export class CameraScreen extends React.Component<Props, State> {
                         <View
                             style={{
                                 borderWidth: 1,
-                                borderColor: 'white'
+                                borderColor: 'white',
+                                alignSelf: 'center'
                             }} 
                         >
-
+                            <TouchableOpacity
+                                style={{}}
+                                onPress={this._onTakePicture}
+                            >
+                                <View style={styles.circle} />
+                            </TouchableOpacity>
                         </View>
                         <View
                             style={{
@@ -185,5 +197,17 @@ export class CameraScreen extends React.Component<Props, State> {
         padding: 5,
         paddingHorizontal: 10,
         color: 'white'
+    },
+    TakePictureButton: {
+
+    },
+    circle: {
+        width: 75,
+        height: 75,
+        borderRadius: 75/2,
+        borderWidth: 3,
+        borderColor: 'white',
+        backgroundColor: 'grey',
+        opacity: .3,
     }
   });
