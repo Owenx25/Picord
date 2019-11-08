@@ -74,7 +74,7 @@ export class Concept extends React.Component<Props, State> {
 
     _addPicording = () => {
         console.log('Navigating to CameraScreen');
-        this.props.navigation.navigate('Camera');
+        this.props.navigation.navigate('CameraScreen');
         // Make user Set a title for recording
 
         // Add flow:

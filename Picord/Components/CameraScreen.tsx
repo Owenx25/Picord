@@ -1,7 +1,9 @@
-import React, { RefObject } from 'react';
-import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from 'react-native';
 
 import { Camera } from 'expo-camera';
+import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
+import { CapturedPicture } from 'expo-camera/build/Camera.types';
 
 enum CameraType {
     front = Camera.Constants.Type.front,
@@ -14,7 +16,7 @@ enum FlashType {
 }
 
 type Props = typeof CameraScreen.defaultProps & {
-
+    navigation: NavigationScreenProp<NavigationState, NavigationParams>
 }
 
 type State = {
@@ -22,7 +24,9 @@ type State = {
     ratio: string,
     ratioIndex: number,
     ratios: Array<string>,
-    flash: FlashType
+    flash: FlashType,
+    pictureTaken: boolean,
+    photo: CapturedPicture
 }
 
 export class CameraScreen extends React.Component<Props, State> {
@@ -32,11 +36,13 @@ export class CameraScreen extends React.Component<Props, State> {
         super(props);
         this.camera = React.createRef();
         this.state = {
-            type: CameraType.back,
+            type: CameraType.front,
             ratio: '16:9',
             ratioIndex: 0,
             ratios: undefined,
-            flash: FlashType.off
+            flash: FlashType.off,
+            pictureTaken: false,
+            photo: null
         };
     }
 
@@ -74,8 +80,17 @@ export class CameraScreen extends React.Component<Props, State> {
 
     _onTakePicture = async () => {
         if (this.camera) {
-            const photo = await this.camera.current.takePictureAsync();
+            let photo = await this.camera.current.takePictureAsync({
+                quality: 1,
+                onPictureSaved: this._onPictureSaved
+            })
+            this.camera.current.pausePreview();
         }
+    }
+
+    _onPictureSaved =  (photo: CapturedPicture) => {
+        // Save photo to state then tell UI we have the picture 
+        this.setState({photo: photo}, () => {this.setState({pictureTaken: true})});
     }
 
     async getRatios(): Promise<Array<string>> {
@@ -98,10 +113,9 @@ export class CameraScreen extends React.Component<Props, State> {
         }
         return 'white';
     }
-    
-    render() {
-      return (
-        <View style={{ flex: 1 }}>
+
+    showCamera(): JSX.Element {
+        return  (
             <Camera 
                 ref={this.camera}
                 style={{ flex: 1}} 
@@ -116,22 +130,9 @@ export class CameraScreen extends React.Component<Props, State> {
                         flexDirection: 'row',                   
                 }}>
                     <View
-                        style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignSelf: 'flex-end',
-                            alignItems: 'flex-end',
-                            justifyContent: 'space-between',
-                            borderWidth: 1,
-                            borderColor: 'white'
-                        }}
+                        style={styles.CameraBottomContainer}
                     >
-                        <View
-                            style={{
-                                borderWidth: 1,
-                                borderColor: 'white'
-                            }}    
-                        >
+                        <View style={styles.LeftButtonContainer}>
                             <TouchableOpacity
                                 style={styles.CameraButton}
                                 onPress={this._onChangeCameraType}
@@ -139,13 +140,7 @@ export class CameraScreen extends React.Component<Props, State> {
                                 <Text style={styles.CameraButtonText}>Flip</Text>
                             </TouchableOpacity>
                         </View>
-                        <View
-                            style={{
-                                borderWidth: 1,
-                                borderColor: 'white',
-                                alignSelf: 'center'
-                            }} 
-                        >
+                        <View style={styles.CenterButtonContainer}>
                             <TouchableOpacity
                                 style={{}}
                                 onPress={this._onTakePicture}
@@ -153,13 +148,7 @@ export class CameraScreen extends React.Component<Props, State> {
                                 <View style={styles.circle} />
                             </TouchableOpacity>
                         </View>
-                        <View
-                            style={{
-                                alignItems: 'flex-end',
-                                borderWidth: 1,
-                                borderColor: 'white'
-                            }}
-                        >
+                        <View style={styles.RightButtonContainer}>
                             <TouchableOpacity
                                 style={[styles.CameraButton, {borderColor: this.flashStyle()}]}
                                 onPress={this._onChangeCameraFlash}
@@ -178,11 +167,33 @@ export class CameraScreen extends React.Component<Props, State> {
                     </View>
                 </View>
             </Camera>
+        )
+    }
+
+    showNewPicture(): JSX.Element {
+        console.log(this.state.photo);
+        return (
+            this.state.photo && <Image source={{uri: this.state.photo.uri}} style={{flex:1}} resizeMode='stretch'/>
+        )
+    }
+    
+    render() {
+      return (
+        <View style={{ flex: 1 }}>
+            {this.showCamera()}
         </View>
     )}
   }
   const styles = StyleSheet.create({
-
+    CameraBottomContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignSelf: 'flex-end',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        borderWidth: 1,
+        borderColor: 'white'
+    },
     CameraButton: {
         width: 75,
         margin: 10, 
@@ -208,6 +219,20 @@ export class CameraScreen extends React.Component<Props, State> {
         borderWidth: 3,
         borderColor: 'white',
         backgroundColor: 'grey',
-        opacity: .3,
+        opacity: .8,
+    },
+    LeftButtonContainer: {
+        borderWidth: 1,
+        borderColor: 'white'
+    },
+    CenterButtonContainer: {
+        borderWidth: 1,
+        borderColor: 'white',
+        alignSelf: 'center'
+    },
+    RightButtonContainer: {
+        alignItems: 'flex-end',
+        borderWidth: 1,
+        borderColor: 'white'
     }
   });

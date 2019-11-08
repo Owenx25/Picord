@@ -4,12 +4,17 @@ import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 import { CameraScreen } from './Components/CameraScreen'
+import { PhotoScreen } from './Components/PhotoScreen'
 
 type Props = typeof HomeScreen.defaultProps & {
   navigation: NavigationType
 }
 
 class HomeScreen extends React.Component<Props, {}> {
+  constructor(props: Props) {
+    super(props);
+  }
+
   render() {
     return (
       <Concept navigation={this.props.navigation}/>
@@ -17,8 +22,9 @@ class HomeScreen extends React.Component<Props, {}> {
 }
 
 const AppNavigator = createStackNavigator({
-  Home: HomeScreen,
-  Camera: CameraScreen
+  HomeScreen: HomeScreen,
+  CameraScreen: CameraScreen,
+  PhotoScreen: PhotoScreen
 });
 
 const AppContainer = createAppContainer(AppNavigator)
