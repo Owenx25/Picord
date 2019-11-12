@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from 'react-native';
+import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
 
 import { Camera } from 'expo-camera';
-import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
 import { CapturedPicture } from 'expo-camera/build/Camera.types';
+
+import { TakePictureButton } from '../TakePictureButton';
+import { CameraOverlayButton } from '../CameraOverlayButton'
 
 enum CameraType {
     front = Camera.Constants.Type.front,
@@ -25,7 +28,7 @@ type State = {
     ratioIndex: number,
     ratios: Array<string>,
     flash: FlashType,
-    pictureTaken: boolean,
+    isShowingPreview: boolean,
     photo: CapturedPicture
 }
 
@@ -41,7 +44,7 @@ export class CameraScreen extends React.Component<Props, State> {
             ratioIndex: 0,
             ratios: undefined,
             flash: FlashType.off,
-            pictureTaken: false,
+            isShowingPreview: false,
             photo: null
         };
     }
@@ -85,12 +88,13 @@ export class CameraScreen extends React.Component<Props, State> {
                 onPictureSaved: this._onPictureSaved
             })
             this.camera.current.pausePreview();
+            // Picture is now frozen on UI, need to render buttons on top
         }
     }
 
     _onPictureSaved =  (photo: CapturedPicture) => {
         // Save photo to state then tell UI we have the picture 
-        this.setState({photo: photo}, () => {this.setState({pictureTaken: true})});
+        this.setState({photo: photo}, () => {this.setState({isShowingPreview: true})});
     }
 
     async getRatios(): Promise<Array<string>> {
@@ -129,40 +133,22 @@ export class CameraScreen extends React.Component<Props, State> {
                         backgroundColor: 'transparent',
                         flexDirection: 'row',                   
                 }}>
-                    <View
-                        style={styles.CameraBottomContainer}
-                    >
+                    <View style={styles.CameraBottomContainer}>
                         <View style={styles.LeftButtonContainer}>
-                            <TouchableOpacity
-                                style={styles.CameraButton}
-                                onPress={this._onChangeCameraType}
-                            >
-                                <Text style={styles.CameraButtonText}>Flip</Text>
-                            </TouchableOpacity>
+                            <CameraOverlayButton onPress={this._onChangeCameraType} text='Flip'/>
                         </View>
                         <View style={styles.CenterButtonContainer}>
-                            <TouchableOpacity
-                                style={{}}
-                                onPress={this._onTakePicture}
-                            >
-                                <View style={styles.circle} />
-                            </TouchableOpacity>
+                            <TakePictureButton onPress={this._onTakePicture}/>
                         </View>
                         <View style={styles.RightButtonContainer}>
-                            <TouchableOpacity
-                                style={[styles.CameraButton, {borderColor: this.flashStyle()}]}
+                            <CameraOverlayButton
                                 onPress={this._onChangeCameraFlash}
-                            >
-                                <Text style={[styles.CameraButtonText, {color: this.flashStyle()}]}>Flash</Text>
-                            </TouchableOpacity>
-                            { this.isOnAndroid  &&
-                                <TouchableOpacity
-                                    style={styles.CameraButton}
-                                    onPress={this._onPressRatioToggle}
-                                >
-                                    <Text style={styles.CameraButtonText}>{this.state.ratio}</Text>
-                                </TouchableOpacity>
-                            }
+                                buttonStyle={{borderColor: this.flashStyle()}}
+                                textStyle={{color: this.flashStyle()}}
+                                text='Flash'
+                            />
+                            { this.isOnAndroid && 
+                                <CameraOverlayButton onPress={this._onPressRatioToggle} text={this.state.ratio} />}
                         </View>   
                     </View>
                 </View>
@@ -193,33 +179,6 @@ export class CameraScreen extends React.Component<Props, State> {
         justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: 'white'
-    },
-    CameraButton: {
-        width: 75,
-        margin: 10, 
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'white',
-        borderRadius: 10
-    },
-    CameraButtonText: {
-        fontSize: 20,
-        padding: 5,
-        paddingHorizontal: 10,
-        color: 'white'
-    },
-    TakePictureButton: {
-
-    },
-    circle: {
-        width: 75,
-        height: 75,
-        borderRadius: 75/2,
-        borderWidth: 3,
-        borderColor: 'white',
-        backgroundColor: 'grey',
-        opacity: .8,
     },
     LeftButtonContainer: {
         borderWidth: 1,

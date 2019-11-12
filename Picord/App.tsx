@@ -1,10 +1,10 @@
 import React from 'react';
-import { Concept } from './Components/Concept';
+import { Concept } from './Components/Screens/Concept';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import { CameraScreen } from './Components/CameraScreen'
-import { PhotoScreen } from './Components/PhotoScreen'
+import { CameraScreen } from './Components/Screens/CameraScreen'
+import { PhotoScreen } from './Components/Screens/PhotoScreen'
 
 type Props = typeof HomeScreen.defaultProps & {
   navigation: NavigationType
