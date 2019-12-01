@@ -3,7 +3,6 @@ import { StyleSheet, View, Button, Image, TouchableHighlight } from 'react-nativ
 
 import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
 
-import Constants from 'expo-constants'
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
@@ -32,6 +31,7 @@ export class Concept extends React.Component<Props, State> {
     }
 
     public componentDidMount() {
+        this.setupDirectoryAsync();
         this.getPermissionAsync();
     }
 
@@ -41,6 +41,18 @@ export class Concept extends React.Component<Props, State> {
             alert('Sorry, we need camera permissions to make this work!');
         } 
         this.setState({hasCameraPermission: status === 'granted'});
+    }
+
+    setupDirectoryAsync = async () => {
+        const picturesDir = FileSystem.documentDirectory + 'Pictures';
+        FileSystem.getInfoAsync(picturesDir)
+        .then(result => { 
+            if (!result.exists) {
+                FileSystem.makeDirectoryAsync(picturesDir);
+                console.log('Picture directory did not exist, creating...');
+            }
+            console.log('Picture directory already exists');
+        });
     }
 
     selectPictureFromCameraRoll = async () => {
@@ -56,21 +68,21 @@ export class Concept extends React.Component<Props, State> {
         }
     }
 
-    addPictureToFileSystem = async () => {
-        // This dir should probably be created on first app init
-        FileSystem.getInfoAsync(FileSystem.documentDirectory + 'Pictures')
-        .then(result => {
-            // The photos should get copied over to a permanent app dir so that
-            // we don't have to worry about losing them. They can still be deleted
-            // from within the app(just like recordings)
-            if(result.exists) {
+    // addPictureToFileSystem = async () => {
+    //     // This dir should probably be created on first app init
+    //     FileSystem.getInfoAsync(FileSystem.documentDirectory + 'Pictures')
+    //     .then(result => {
+    //         // The photos should get copied over to a permanent app dir so that
+    //         // we don't have to worry about losing them. They can still be deleted
+    //         // from within the app(just like recordings)
+    //         if(result.exists) {
 
-            }
-        })
-        .catch(() => {
-            console.error('failed trying to find pictures folder')
-        })
-    }
+    //         }
+    //     })
+    //     .catch(() => {
+    //         console.error('failed trying to find pictures folder');
+    //     })
+    // }
 
     _addPicording = () => {
         console.log('Navigating to CameraScreen');

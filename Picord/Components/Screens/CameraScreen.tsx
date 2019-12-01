@@ -1,14 +1,17 @@
 import React from 'react';
-import { View, Platform, StyleSheet, Image } from 'react-native';
+import { View, Platform, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
 
 import { Camera } from 'expo-camera';
 import { CapturedPicture } from 'expo-camera/build/Camera.types';
 import { MaterialIcons } from '@expo/vector-icons';
+import { ScreenOrientation } from 'expo';
 import Constants from 'expo-constants';
+import * as FileSystem from 'expo-file-system';
 
 import { TakePictureButton } from '../TakePictureButton';
 import { CameraOverlayButton } from '../CameraOverlayButton';
+import { OrientationInfo } from 'expo/build/ScreenOrientation/ScreenOrientation';
 
 enum CameraType {
     front = Camera.Constants.Type.front,
@@ -87,16 +90,53 @@ export class CameraScreen extends React.Component<Props, State> {
         if (this.camera) {
             let photo = await this.camera.current.takePictureAsync({
                 quality: 1,
-                onPictureSaved: this._onPictureSaved
+                onPictureSaved: this._onPictureTaken
             })
             this.camera.current.pausePreview();
             // Picture is now frozen on UI, need to render buttons on top
         }
     }
 
-    _onPictureSaved =  (photo: CapturedPicture) => {
+    _onPictureTaken =  (photo: CapturedPicture) => {
         // Save photo to state then tell UI we have the picture 
         this.setState({photo: photo}, () => {this.setState({isShowingPreview: true})});
+        // Orientation needs to be locked for the preview
+        ScreenOrientation.getOrientationAsync()
+        .then(orientationInfo => ScreenOrientation.lockAsync(this.getOrientationLock(orientationInfo.orientation)));
+        //console.log('orientation locked');
+    }
+
+    getOrientationLock = (orientation: ScreenOrientation.Orientation) => {
+        //console.log('current orientation is ' + orientation);
+        if (orientation === ScreenOrientation.Orientation.LANDSCAPE
+          || orientation === ScreenOrientation.Orientation.LANDSCAPE_LEFT
+          || orientation === ScreenOrientation.Orientation.LANDSCAPE_RIGHT
+        ) {
+            return ScreenOrientation.OrientationLock.LANDSCAPE;
+        } else if (orientation === ScreenOrientation.Orientation.PORTRAIT
+          || orientation === ScreenOrientation.Orientation.PORTRAIT_UP
+          || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN    
+        ) {
+            return ScreenOrientation.OrientationLock.PORTRAIT;
+        } 
+    }
+
+    _onPictureReset = () => {
+        ScreenOrientation.unlockAsync();
+        console.log('orientation unlocked');
+        // User wants to retake the picture
+        this.setState({isShowingPreview: false});
+        this.camera.current.resumePreview();
+    }
+
+    _onPictureSaved = () => {
+        ScreenOrientation.unlockAsync();
+        console.log('orientation unlocked');
+        // Picture is saved and we setup for recording
+        // Save to permanent directory
+        FileSystem.copyAsync({from: this.state.photo.uri, to: FileSystem.documentDirectory + 'Pictures'});
+        // Add record button
+
     }
 
     async getRatios(): Promise<Array<string>> {
@@ -125,7 +165,14 @@ export class CameraScreen extends React.Component<Props, State> {
             return ( 
                 <View style={[styles.CameraTopContainer, {marginTop: Constants.statusBarHeight}]}>
                     <View style={styles.LeftButtonContainer}>
-                        <MaterialIcons name="close" size={24} color='white'/>
+                        <TouchableOpacity onPress={this._onPictureReset} style={{marginTop: 10, marginStart: 10}}>
+                            <MaterialIcons name="close" size={48} color='white'/>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.RightButtonContainer}>
+                        <TouchableOpacity onPress={this._onPictureSaved} style={{marginTop: 10, marginEnd: 10}}>
+                            <MaterialIcons name="chevron-right" size={48} color='white'/>
+                        </TouchableOpacity>
                     </View>
                 </View>
             )
