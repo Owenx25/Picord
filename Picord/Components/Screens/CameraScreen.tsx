@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from 'react-native';
+import { View, Platform, StyleSheet, Image } from 'react-native';
 import { NavigationScreenProp, NavigationState, NavigationParams } from 'react-navigation';
 
 import { Camera } from 'expo-camera';
 import { CapturedPicture } from 'expo-camera/build/Camera.types';
+import { MaterialIcons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 
 import { TakePictureButton } from '../TakePictureButton';
-import { CameraOverlayButton } from '../CameraOverlayButton'
+import { CameraOverlayButton } from '../CameraOverlayButton';
 
 enum CameraType {
     front = Camera.Constants.Type.front,
@@ -118,6 +120,40 @@ export class CameraScreen extends React.Component<Props, State> {
         return 'white';
     }
 
+    getOverlayComponent(): JSX.Element {
+        if (this.state.isShowingPreview) {
+            return ( 
+                <View style={[styles.CameraTopContainer, {marginTop: Constants.statusBarHeight}]}>
+                    <View style={styles.LeftButtonContainer}>
+                        <MaterialIcons name="close" size={24} color='white'/>
+                    </View>
+                </View>
+            )
+        } else {
+            return (
+                <View style={styles.CameraBottomContainer}>
+                    <View style={styles.LeftButtonContainer}>
+                        <CameraOverlayButton onPress={this._onChangeCameraType} text='Flip'/>
+                    </View>
+                    <View style={styles.CenterButtonContainer}>
+                        <TakePictureButton onPress={this._onTakePicture}/>
+                    </View>
+                    <View style={styles.RightButtonContainer}>
+                        <CameraOverlayButton
+                            onPress={this._onChangeCameraFlash}
+                            buttonStyle={{borderColor: this.flashStyle()}}
+                            textStyle={{color: this.flashStyle()}}
+                            text='Flash'
+                        />
+                        { this.isOnAndroid && 
+                            <CameraOverlayButton onPress={this._onPressRatioToggle} text={this.state.ratio} />
+                        }
+                    </View>   
+                </View>
+            )
+        }
+    }
+
     showCamera(): JSX.Element {
         return  (
             <Camera 
@@ -133,24 +169,7 @@ export class CameraScreen extends React.Component<Props, State> {
                         backgroundColor: 'transparent',
                         flexDirection: 'row',                   
                 }}>
-                    <View style={styles.CameraBottomContainer}>
-                        <View style={styles.LeftButtonContainer}>
-                            <CameraOverlayButton onPress={this._onChangeCameraType} text='Flip'/>
-                        </View>
-                        <View style={styles.CenterButtonContainer}>
-                            <TakePictureButton onPress={this._onTakePicture}/>
-                        </View>
-                        <View style={styles.RightButtonContainer}>
-                            <CameraOverlayButton
-                                onPress={this._onChangeCameraFlash}
-                                buttonStyle={{borderColor: this.flashStyle()}}
-                                textStyle={{color: this.flashStyle()}}
-                                text='Flash'
-                            />
-                            { this.isOnAndroid && 
-                                <CameraOverlayButton onPress={this._onPressRatioToggle} text={this.state.ratio} />}
-                        </View>   
-                    </View>
+                    {this.getOverlayComponent()}
                 </View>
             </Camera>
         )
@@ -176,6 +195,15 @@ export class CameraScreen extends React.Component<Props, State> {
         flexDirection: 'row',
         alignSelf: 'flex-end',
         alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        borderWidth: 1,
+        borderColor: 'white'
+    },
+    CameraTopContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignSelf: 'flex-start',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: 'white'
