@@ -87,7 +87,6 @@ export class CameraScreen extends React.Component<Props, State> {
     }
 
     _onTakePicture = async () => {
-        console.log(this.state.flash);
         if (this.camera) {
             let photo = await this.camera.current.takePictureAsync({
                 quality: 1,
@@ -164,39 +163,49 @@ export class CameraScreen extends React.Component<Props, State> {
     getOverlayComponent(): JSX.Element {
         if (this.state.isShowingPreview) {
             return ( 
-                <View style={[styles.CameraTopContainer, {marginTop: Constants.statusBarHeight}]}>
-                    <View style={styles.LeftButtonContainer}>
-                        <TouchableOpacity onPress={this._onPictureReset} style={{marginTop: 10, marginStart: 10}}>
-                            <MaterialIcons name="close" size={48} color='white'/>
-                        </TouchableOpacity>
+                <View style={styles.MainContainer}>
+                    <View style={[styles.CameraContainer, {marginTop: Constants.statusBarHeight}]}>
+                        <View style={styles.ButtonContainer}>
+                            <TouchableOpacity onPress={this._onPictureReset} style={{marginTop: 10, marginStart: 10}}>
+                                <MaterialIcons name="close" size={48} color='white'/>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View style={styles.RightButtonContainer}>
-                        <TouchableOpacity onPress={this._onPictureSaved} style={{marginTop: 10, marginEnd: 10}}>
-                            <MaterialIcons name="chevron-right" size={48} color='white'/>
-                        </TouchableOpacity>
+                    <View style={[styles.CameraContainer, {justifyContent: 'center'}]}>
+                        <View style={[styles.ButtonContainer, {alignItems: 'stretch'}]}>
+                            <CameraOverlayButton 
+                                onPress={this._onPictureSaved} 
+                                text='Record'
+                                buttonStyle={{borderColor: 'lime', borderWidth: 2, marginBottom: 30}}
+                                textStyle={{color: 'lime', fontSize: 35, fontWeight: 'bold'}}
+                            />
+                        </View>
                     </View>
                 </View>
             )
         } else {
             return (
-                <View style={styles.CameraBottomContainer}>
-                    <View style={styles.LeftButtonContainer}>
-                        <CameraOverlayButton onPress={this._onChangeCameraType} text='Flip'/>
+                <View style={styles.MainContainer}>
+                    <View/>
+                    <View style={styles.CameraContainer}>
+                        <View style={styles.ButtonContainer}>
+                            <CameraOverlayButton onPress={this._onChangeCameraType} text='Flip'/>
+                        </View>
+                        <View style={[styles.ButtonContainer, {alignSelf: 'center'}]}>
+                            <TakePictureButton onPress={this._onTakePicture}/>
+                        </View>
+                        <View style={styles.ButtonContainer}>
+                            <CameraOverlayButton
+                                onPress={this._onChangeCameraFlash}
+                                buttonStyle={{borderColor: this.flashStyle()}}
+                                textStyle={{color: this.flashStyle()}}
+                                text='Flash'
+                            />
+                            { this.isOnAndroid && 
+                                <CameraOverlayButton onPress={this._onPressRatioToggle} text={this.state.ratio} />
+                            }
+                        </View>   
                     </View>
-                    <View style={styles.CenterButtonContainer}>
-                        <TakePictureButton onPress={this._onTakePicture}/>
-                    </View>
-                    <View style={styles.RightButtonContainer}>
-                        <CameraOverlayButton
-                            onPress={this._onChangeCameraFlash}
-                            buttonStyle={{borderColor: this.flashStyle()}}
-                            textStyle={{color: this.flashStyle()}}
-                            text='Flash'
-                        />
-                        { this.isOnAndroid && 
-                            <CameraOverlayButton onPress={this._onPressRatioToggle} text={this.state.ratio} />
-                        }
-                    </View>   
                 </View>
             )
         }
@@ -238,36 +247,23 @@ export class CameraScreen extends React.Component<Props, State> {
     )}
   }
   const styles = StyleSheet.create({
-    CameraBottomContainer: {
+    MainContainer: {
         flex: 1,
+        flexDirection: 'column',
+        justifyContent:'space-between',
+        borderWidth: 1,
+        borderColor: 'white'
+    },
+    CameraContainer: {
         flexDirection: 'row',
-        alignSelf: 'flex-end',
-        alignItems: 'flex-end',
+        alignItems: 'stretch',
         justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: 'white'
     },
-    CameraTopContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        alignSelf: 'flex-start',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
+    ButtonContainer: {
+        justifyContent: 'flex-end',
         borderWidth: 1,
         borderColor: 'white'
     },
-    LeftButtonContainer: {
-        borderWidth: 1,
-        borderColor: 'white'
-    },
-    CenterButtonContainer: {
-        borderWidth: 1,
-        borderColor: 'white',
-        alignSelf: 'center'
-    },
-    RightButtonContainer: {
-        alignItems: 'flex-end',
-        borderWidth: 1,
-        borderColor: 'white'
-    }
   });

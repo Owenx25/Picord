@@ -41,7 +41,7 @@ export class CameraOverlayButton extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
     CameraButton: {
-        width: 75,
+        minWidth: 75,
         margin: 10, 
         justifyContent: 'center',
         alignItems: 'center',
