@@ -19,8 +19,8 @@ enum CameraType {
 }
 
 enum FlashType {
-    on = 'on',
-    off = 'off'
+    on = Camera.Constants.FlashMode.on,
+    off = Camera.Constants.FlashMode.off
 }
 
 type Props = typeof CameraScreen.defaultProps & {
@@ -87,6 +87,7 @@ export class CameraScreen extends React.Component<Props, State> {
     }
 
     _onTakePicture = async () => {
+        console.log(this.state.flash);
         if (this.camera) {
             let photo = await this.camera.current.takePictureAsync({
                 quality: 1,
@@ -123,7 +124,7 @@ export class CameraScreen extends React.Component<Props, State> {
 
     _onPictureReset = () => {
         ScreenOrientation.unlockAsync();
-        console.log('orientation unlocked');
+        console.log('orientation unlocked after retake');
         // User wants to retake the picture
         this.setState({isShowingPreview: false});
         this.camera.current.resumePreview();
@@ -131,7 +132,7 @@ export class CameraScreen extends React.Component<Props, State> {
 
     _onPictureSaved = () => {
         ScreenOrientation.unlockAsync();
-        console.log('orientation unlocked');
+        console.log('orientation unlocked after saving');
         // Picture is saved and we setup for recording
         // Save to permanent directory
         FileSystem.copyAsync({from: this.state.photo.uri, to: FileSystem.documentDirectory + 'Pictures'});
@@ -154,7 +155,7 @@ export class CameraScreen extends React.Component<Props, State> {
     }
 
     flashStyle(): string {
-        if (this.state.flash === FlashType.off) {
+        if (this.state.flash === Camera.Constants.FlashMode.off) {
             return 'red';
         }
         return 'white';
